@@ -1,0 +1,49 @@
+SOURCE = '~/MATLAB/datasets_all/multispectral/';
+fileNames = {...
+	'balloons_ms',...
+	'beads_ms'...
+	'sponges_ms',...
+	'oil_painting_ms',...
+	'flowers_ms',...
+	'cd_ms',...
+	'fake_and_real_peppers_ms',...
+	'photo_and_face_ms',...
+	};
+
+largeM = 512;
+largeN = 512;
+samplingFactor = 1;
+tau = 20;
+wavelengths = 400:10:700;
+Y = getKernelFactor(wavelengths, tau);
+W = eye(31);
+ps = 0.05;
+M = largeM / 2 ^ samplingFactor;
+N = largeN / 2 ^ samplingFactor;
+
+numFiles = length(fileNames);
+for iterFiles = 1:numFiles,
+	fprintf('Now running file %s, number %d out of %d.\n', fileNames{iterFiles}, iterFiles, numFiles);
+	cube = getCube(sprintf('%s/%s/%s', SOURCE, fileNames{iterFiles}, fileNames{iterFiles}), 'png', 1:31, 0);
+	cube = cube / maxv(cube);
+	cubedown = downSampleCube(cube, samplingFactor);
+% 	noisevec = addBernoulliSignSupportNoise(M * N * 31, 1, ps);
+	load(sprintf('robust_pca_ps%g_def_%s_sub%d.mat', ps,...
+		fileNames{iterFiles}, samplingFactor),...
+		'noisevec');
+	cubedownnoise = cubedown + reshape(noisevec, size(cubedown));
+	
+% 	[B A] = robust_pca_apg_mex(reshape(cubedownnoise, [M * N, 31]), [], [], [], [], [],	100000);
+% 	cube_background = reshape(B, [M N 31]);
+% 	cube_foreground = reshape(A, [M N 31]);
+% 	save(sprintf('robust_pca_ps%g_def_%s_sub%d.mat', ps,...
+% 		fileNames{iterFiles}, samplingFactor),...
+% 		'cube_background', 'cube_foreground', 'noisevec');
+	
+	[B A] = robust_operator_pca_apg_mex(reshape(cubedownnoise, [M * N, 31]), Y, [], [], [], [], [],	100000);
+	cube_background = reshape(B, [M N 31]);
+	cube_foreground = reshape(A, [M N 31]);
+	save(sprintf('robust_oppca_ps%g_tau%g_def_%s_sub%d.mat', ps, tau,...
+		fileNames{iterFiles}, samplingFactor),...
+		'cube_background', 'cube_foreground', 'noisevec');
+end;

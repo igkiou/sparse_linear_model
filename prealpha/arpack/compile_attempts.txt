@@ -1,0 +1,3 @@
+ifort -shared -L/opt/intel/mkl/10.2.5.035/lib/em64t/ -Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -liomp5 -lpthread -lsvml /opt/intel/composerxe-2011.1.107/compiler/lib/intel64/libifport.so /opt/intel/composerxe-2011.1.107/compiler/lib/intel64/libifcore.so *.o -o libarpack.so
+
+icc -fPIC -Wall -DMKL_ILP64 -lf2c -I/opt/intel/mkl/10.2.5.035/include/ -L/opt/intel/Compiler/11.1/072/lib/intel64/ -shared -L/opt/intel/mkl/10.2.5.035/lib/em64t/ -Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -lsvml -liomp5 -lpthread -L/home/igkiou/temp/ARPACK_attempt2/arpack_mkl -larpack dsvd.c -o dsvd

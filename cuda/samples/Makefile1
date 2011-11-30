@@ -1,0 +1,61 @@
+# PRODUCE_REPORTS = 1 
+# USE_GUIDE = 1
+# GENERATE_PROFILE = 1 
+# USE_PROFILE = 1
+# DEBUG_MODE = 1
+USE_CUDA = 1
+
+include ../../icc.mk
+
+ROOTDIR = $(shell pwd)
+INCLUDEDIR = $(ROOTDIR)
+SRCDIR = $(ROOTDIR)
+ifdef USE_CUDA
+	CUDASRCDIR = $(ROOTDIR)
+endif
+MEXDIR = $(ROOTDIR)
+BINDIR = $(ROOTDIR)
+INCLUDES += -I$(INCLUDEDIR)
+
+all: temp
+	
+temp: \
+	$(MEXDIR)/cudaSampleSoft.$(MEXEXT)
+
+# mex executable files
+	
+ifdef USE_CUDA
+$(MEXDIR)/cudaSampleSoft.$(MEXEXT): \
+	$(MEXDIR)/cudaSampleSoft.o \
+	$(SRCDIR)/cudaSampleKernel_sub.o
+	$(CC) $(LDFLAGS) $(LIBS) $(CFLAGS) -o $@ $^
+else
+$(MEXDIR)/nuclear_proximal_cuda_mex.$(MEXEXT): \
+	$(MEXDIR)/nuclear_proximal_cuda_mex.o \
+	$(SRCDIR)/matrix_proximal.o \
+	$(SRCDIR)/useblas.o \
+	$(SRCDIR)/utils.o
+	$(CC) $(LDFLAGS) $(LIBS) $(CFLAGS) -o $@ $^
+endif
+
+# src object files
+$(SRCDIR)/cudaSampleSoft.o: \
+	$(SRCDIR)/cudaSampleSoft.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $*.cpp
+		
+$(CUDASRCDIR)/cudaSampleKernel_sub.o: \
+	$(CUDASRCDIR)/cudaSampleKernel_sub.cu
+	$(NVCC) $(NVCFLAGS) $(INCLUDES) -c -o $@ $*.cu
+
+clean:	
+	rm -rf *.o *~
+	rm -rf $(MEXDIR)/*.o $(MEXDIR)/*~
+	rm -rf $(SRCDIR)/*.o $(SRCDIR)/*~
+
+distclean:	
+	rm -rf *.o *~
+	rm -rf $(MEXDIR)/*.o $(MEXDIR)/*.$(MEXEXT) $(MEXDIR)/*~
+	rm -rf $(SRCDIR)/*.o $(SRCDIR)/*~
+ifdef USE_CUDA
+	rm -rf $(CUDASRCDIR)/*.o $(CUDASRCDIR)/*~
+endif

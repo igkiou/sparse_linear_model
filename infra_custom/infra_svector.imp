@@ -1,0 +1,431 @@
+//=============================================================================
+// File Name: infra_svector.imp
+// Written by: Ofer Dekel (oferd@cs.huji.ac.il)
+//
+// Distributed as part of the infra C++ library for linear algebra
+// Copyright (C) 2004 Ofer Dekel
+// 
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// 
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//=============================================================================
+#ifndef _OFERD_SVECTOR_IMP_
+#define _OFERD_SVECTOR_IMP_
+
+//*****************************************************************************
+// Included Files
+//*****************************************************************************
+#include "infra_svector.h"
+#include "infra_exception.h"
+#include <algorithm>
+#include <math.h> // for pow()
+
+//=============================================================================
+//  sentry definitions
+//=============================================================================
+/*---------------------------------------------------------------------------*/
+infra::sentry::sentry() : index(0), value(NULL_VALUE) {}
+
+/*---------------------------------------------------------------------------*/
+infra::sentry::sentry(unsigned long ind, const double& val) : index(ind),
+						   value(val) {}
+
+/*---------------------------------------------------------------------------*/
+infra::sentry::sentry(const infra::sentry& other) :
+  index(other.index), value(other.value) {}
+
+/*---------------------------------------------------------------------------*/
+bool infra::sentry::operator <(unsigned long i) const {
+  return (index < i); 
+}
+
+/*---------------------------------------------------------------------------*/
+bool infra::sentry::operator ==(const sentry& other) const {
+  return (index == other.index && value == other.value); 
+}
+
+/*---------------------------------------------------------------------------*/
+bool infra::sentry::operator ==(unsigned long i) const {
+  return (index == i); 
+}
+
+//=============================================================================
+// svector::reference 
+//=============================================================================
+/*---------------------------------------------------------------------------*/
+infra::svector::reference::reference(svector& v, unsigned long i) : _sv(v), 
+                                                                    _index(i){}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::reference::operator const double () const {
+  return _sv.get(_index);
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::reference::operator = (const double& s) {
+  if(s != NULL_VALUE) _sv.set(_index,s);
+  else _sv.erase(_index);
+  return s;
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::reference::operator *= (const double& s) {
+  double new_value = _sv.get(_index) * s;
+  if(new_value != NULL_VALUE) _sv.set(_index, new_value);
+  else _sv.erase(_index);
+  return new_value;
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::reference::operator /= (const double& s) {
+  double new_value = _sv.get(_index) / s;
+  if(new_value != NULL_VALUE) _sv.set(_index, new_value);
+  else _sv.erase(_index);
+  return new_value;
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::reference::operator += (const double& s) {
+  double new_value = _sv.get(_index) + s;
+  if(new_value != NULL_VALUE) _sv.set(_index, new_value);
+  else _sv.erase(_index);
+  return new_value;
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::reference::operator -= (const double& s) {
+  double new_value = _sv.get(_index) - s;
+  if(new_value != NULL_VALUE) _sv.set(_index, new_value);
+  else _sv.erase(_index);
+  return new_value;
+}
+
+//=============================================================================
+//  svector definitions
+//=============================================================================
+
+/*---------------------------------------------------------------------------*/
+infra::svector::svector(unsigned long size) :
+  _size(size), _data(1) {
+  _data[0].index = size;
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::svector(const svector& other) : 
+  _size(other._size), _data(other._data) {}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::~svector() {}
+
+/*---------------------------------------------------------------------------*/
+void infra::svector::swap(svector& other) {
+  
+  // swap the members of the two objects
+  unsigned long tmp1 = _size;
+  _size = other._size;
+  other._size = tmp1;
+
+  _data.swap(other._data);
+}
+
+/*---------------------------------------------------------------------------*/
+void infra::svector::resize(unsigned long size) {
+
+  // initialize all of the vector indices to be zero
+  iterator begin = _data.begin();
+  iterator end = _data.end();
+
+  iterator find = lower_bound(begin, end, size);
+  _data.erase(find+1,end);
+
+  _data.back().index = size;
+  _data.back().value = NULL_VALUE;
+  
+  _size = size;
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::svector(FILE* stream) {
+
+  // read header from file
+  char header;
+  fread(&header, sizeof(char), 1, stream);
+  if (header != 's') {
+    std::cerr << "Wrong file format when reading infra::svector from file.\n";
+    exit(1);
+  }
+
+  // read total block size
+  size_t block_size;
+  fread(&block_size, sizeof(size_t), 1, stream);
+  
+  // read vector dimensions
+  fread(&_size, sizeof(unsigned long), 1, stream);
+  unsigned long entries;
+  fread(&entries, sizeof(unsigned long), 1, stream);
+  
+  // create _data
+  _data.resize(entries+1);
+
+  // finally, read the data from the file.
+  fread((void*)&_data.front(), sizeof(infra::sentry), entries+1, stream);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::load_binary(FILE* stream) {
+  svector tmp(stream);
+  swap(tmp);
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+void infra::svector::save_binary(FILE* stream) const {
+
+  // write header
+  char header = 's';
+  fwrite(&header, sizeof(char), 1, stream);
+
+  // write the total block size
+  unsigned long entries = _data.size();
+  size_t block_size = sizeof(unsigned long) * 2 + sizeof(infra::sentry) * (entries+1);
+  fwrite(&block_size, sizeof(size_t), 1, stream);
+
+  // write the vector dimensions
+  fwrite(&_size, sizeof(unsigned long), 1, stream);
+  fwrite(&entries, sizeof(unsigned long), 1, stream);
+ 
+  // write the data
+  fwrite((void*)&_data.front(), sizeof(infra::sentry), entries+1, stream);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::operator = (const infra::svector& other) {
+
+  infra_assert(_size == other._size, "When calling operator =, both left and "
+	       << "right hand vectors must have equal size. In this case, "
+	       << "the left-hand size was " << _size << " and the right-hand "
+	       << "size was " << other._size);
+	      
+  _data = other._data;
+
+  // return a reference to this vector
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+unsigned long infra::svector::size() const{
+  return _size;
+}
+
+/*---------------------------------------------------------------------------*/
+unsigned long infra::svector::entries() const{
+  return _data.size()-1;
+}
+
+/*---------------------------------------------------------------------------*/
+bool infra::svector::is_null(unsigned long index) const {
+
+  infra_assert( index < _size, "The vector coordinate being queried by "
+		<< "is_null() exceeds the vector size. The index given is "
+		<< index << " while the vector size is " << size() );
+  
+  const_iterator iter = find(_data.begin(), _data.end(), index);
+  if(iter == _data.end()) return true;
+  return false;
+}
+  
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::set(unsigned long index, const double& value) {
+
+  infra_assert( index < _size, "The vector coordinate being set exceeds the "
+		<< "vector size. The index given is " << index
+		<< " while the vector size is " << size() );
+
+  infra_assert( value != NULL_VALUE, "The function set does not support "
+		<< "setting an entry to zero value. Use the erase() function "
+		<< "instead");
+
+  iterator iter = lower_bound(_data.begin(), _data.end(), index);
+  if(iter->index == index) {
+    iter->value = value;
+  }
+  else {
+    _data.insert(iter, sentry(index,value));
+  }
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::get(unsigned long index) const {
+
+  infra_assert( index < _size, "The vector coordinate being referenced "
+		<< "exceeds the vector size. The index given is " << index
+		<< " while the vector size is " << size() );
+
+  const_iterator iter = lower_bound(_data.begin(), _data.end(), index);
+  if(iter->index == index) {
+    return iter->value;
+  }
+  else {
+    return NULL_VALUE;
+  }
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::operator()(unsigned long index) const {
+  return get(index);
+}
+
+/*---------------------------------------------------------------------------*/
+const double infra::svector::operator[](unsigned long index) const {
+  return get(index);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::reference infra::svector::operator()(unsigned long index) {
+  return reference(*this, index);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::reference infra::svector::operator[](unsigned long index) {
+  return reference(*this, index);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::erase(unsigned long index) {
+
+  infra_assert( index < _size, "The vector coordinate being erased exceeds "
+		<< "the vector size. The index given is " << index
+		<< " while the vector size is " << size() );
+  
+  iterator iter = find(_data.begin(), _data.end(), index);
+  if(iter != _data.end()) _data.erase(iter);
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::iterator infra::svector::begin() {
+  return _data.begin();
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::iterator infra::svector::end() {
+  return _data.end()-1;
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::const_iterator infra::svector::begin() const {
+  return _data.begin();
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector::const_iterator infra::svector::end() const {
+  return _data.end()-1;
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::pow(const double& scalar) {
+  iterator iter = _data.begin();
+  iterator end = _data.end()-1;
+  while(iter < end) {
+    iter->value = ::pow(iter->value,scalar);
+    ++iter;
+  }
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+bool infra::svector::operator == (const svector& other) const {
+  return _data == other._data;
+}
+
+/*---------------------------------------------------------------------------*/
+bool infra::svector::operator != (const svector& other) const {
+  return _data != other._data;
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::operator *= (const double& scalar) {
+  iterator iter = _data.begin();
+  iterator end = _data.end()-1;
+  while(iter < end) {
+    iter->value *= scalar;
+    ++iter;
+  }
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+infra::svector& infra::svector::operator /= (const double& scalar) {
+
+  infra_assert( scalar != 0.0, "Divide by zero error");
+
+  iterator iter = _data.begin();
+  iterator end = _data.end()-1;
+  while(iter < end) {
+    iter->value /= scalar;
+    ++iter;
+  }
+  return (*this);
+}
+
+/*---------------------------------------------------------------------------*/
+std::ostream& infra::operator<< (std::ostream& os, const infra::svector& v) {
+
+  os << v.size() << " " << v.entries() << " ";
+
+  // print data
+  infra::svector::const_iterator iter = v.begin();
+  infra::svector::const_iterator end = v.end();
+  while(iter < end) {
+    os << iter->index << " " << iter->value << " ";
+    ++iter;
+  }
+
+  return os;
+}
+
+/*---------------------------------------------------------------------------*/
+std::istream& infra::operator>> (std::istream& is, infra::svector& v) {
+
+  // read size from the stream
+  unsigned long size, entries;
+  is >> size;
+  is >> entries;
+  
+  svector tmp(size);
+  tmp._data.resize(entries+1);
+  svector::iterator iter = tmp.begin();
+  svector::iterator end = tmp.end() - 1;
+
+  while(iter < end) {
+    is >> iter-> index;
+    if(!is.good()) {}
+    is >> iter-> value;
+    if(!is.good()) {}
+    ++iter;
+  }
+
+  iter->index = size;
+  iter->value = NULL_VALUE;
+
+  // swap with v
+  tmp.swap(v);
+  return is;
+}
+
+#endif
+//*****************************************************************************
+//                                     E O F
+//*****************************************************************************

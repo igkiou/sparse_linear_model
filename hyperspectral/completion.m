@@ -1,0 +1,21 @@
+cube = getCube('~/MATLAB/datasets_all/multispectral/beads_ms/beads_ms', 'png', 1:31);
+cube = cube / maxv(cube);
+cubedown = downSampleCube(cube, 2);
+[M N O] = size(cubedown);
+cubedown = reshape(cubedown, [M * N, O]);
+percentage = 0.1;
+numEl = M * N * O;
+numObs = ceil(percentage * numEl);
+inds = randperm(numEl);
+inds = inds(1:numObs);
+inds = sort(inds);
+[a b] = ind2sub([M * N O], inds);
+observationMat(:, 1) = a;
+observationMat(:, 2) = b;
+observationMat(:, 3) = cubedown(inds);
+% B1 = matrix_completion_apg_mex(M * N, O, observationMat, [], [], [], [], 100000);
+
+tau = 20;
+wavelengths = 400:10:700;
+Y = getKernelFactor(wavelengths, tau);
+B1 = operator_completion_apg_mex(M * N, O, observationMat, Y, [], [], [], [], 100000);

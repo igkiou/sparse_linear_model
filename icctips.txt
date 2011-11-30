@@ -1,0 +1,24 @@
+Intel Compiler Tips (v11.1.072)
+February 3rd, 2011
+
+General:
+-Remember to deactivate -g for final version. Disables optimization flags.
+-Try profile guided compilation, after debugging, using datasets of normal size.
+-Try switching to -fp-model fast=2 (instead of default fast=1) for more aggressive fp optimizations.
+-Use #pragma loop_count (n) and #pragma loop_count min(n), max(n), avg(n) to indicate approximate number of iterations for loops.
+-Use #pragma distribute point and #pragma parallel.
+-Try using -parallel to activate automatic parallelizations.
+-Compile with -openmp-report 2 -opt-report 3 -vec-report 3 (and -par-report 3) and use reports to optimize with pragmas.
+
+Specific:
+-Use Intel Thread Profiler.
+
+Test:
+-Try -(a)xT and -(a)xP against -(a)xHOST.
+
+Notes:
+-Change -x(option) to -m(option) for non-Intel processors.
+
+Cases:
+-Copying with copy and long strides more efficient than with fors. Generally for long stride vs for loop.
+-Use of COPY more efficient than memcpy.

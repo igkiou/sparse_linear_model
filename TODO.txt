@@ -1,0 +1,6 @@
+- TODOs from sparse_linear_model
+- Two improved methods for trace-norm minimization
+- Move SVMs to C with conjugate gradients
+- Write mex files for huberhinge versions of multi-task SVM
+- Integrate gcc-gsl solvers into code
+- Check with new MATLAB
