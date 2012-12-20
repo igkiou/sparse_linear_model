@@ -33,7 +33,7 @@ for iterTau = 1:numTauVals,
 	fprintf('Now running iter %d out of %d.\n', iterTau, numTauVals);
 	
 	dataMatrix(:, 5) = 1;
-	[X, spread, indo, G, slack] = yanmds(dataMatrix, nImages, tauValues(iterTau) * size(dataMatrix, 1)); % 
+	[X, spread, indo, G, slack] = yanmds(dataMatrix, numCities, tauValues(iterTau) * size(dataMatrix, 1)); % 
 	dataMatrix(:, 5) = - 1;
 	temp = getViolations(G, [], dataMatrix(:, 1:4), dataMatrix(:, 5));
 	rank_ya(iterTau) = rank(G);
@@ -44,8 +44,8 @@ for iterTau = 1:numTauVals,
 
 	dataMatrix(:, 5) = - 1;
 	tauList = getContinuationList(tauValues(iterTau), 100, 1);
-% 	[L, converged, Z, viol_fpc] = nmmds_fpc(nImages, dataMatrix, tauList, [], 0.01, 100000);
-	K = nmmds_fpc_mex(nImages, dataMatrix, [], tauList, [], etaFPC, numItersFPC);
+% 	[L, converged, Z, viol_fpc] = nmmds_fpc(numCities, dataMatrix, tauList, [], 0.01, 100000);
+	K = nmmds_fpc_mex(numCities, dataMatrix, [], tauList, [], etaFPC, numItersFPC);
 	temp = getViolations(K, [], dataMatrix(:, 1:4), dataMatrix(:, 5));
 	rank_fpc(iterTau) = rank(K);
 	viol_fpc(iterTau) = sum(temp > 0);
@@ -55,8 +55,8 @@ for iterTau = 1:numTauVals,
 
 	dataMatrix(:, 5) = - 1;
 	tauList = getContinuationList(tauValues(iterTau), 100, 1);
-% 	[L, converged, Z, viol_fpc] = nmmds_fpc(nImages, dataMatrix, tauList, [], 0.01, 100000);
-	L = nmmds_apg_mex(nImages, dataMatrix, [], tauList, [], etaAPG, numItersAPG);
+% 	[L, converged, Z, viol_fpc] = nmmds_fpc(numCities, dataMatrix, tauList, [], 0.01, 100000);
+	L = nmmds_apg_mex(numCities, dataMatrix, [], tauList, [], etaAPG, numItersAPG);
 	temp = getViolations(L, [], dataMatrix(:, 1:4), dataMatrix(:, 5));
 	rank_apg(iterTau) = rank(L);
 	viol_apg(iterTau) = sum(temp > 0);
@@ -66,7 +66,7 @@ for iterTau = 1:numTauVals,
 
 	dataMatrix(:, 5) = - 1;
 	tauList = getContinuationList(tauValues(iterTau), 100, 1);
-	F = nmmds_smooth_apg_mex(nImages, dataMatrix, [], tauList, [], etaSAPG, numItersSAPG);
+	F = nmmds_smooth_apg_mex(numCities, dataMatrix, [], tauList, [], etaSAPG, numItersSAPG);
 	temp = getViolations(F, [], dataMatrix(:, 1:4), dataMatrix(:, 5));
 	rank_smooth_apg(iterTau) = rank(F);
 	viol_smooth_apg(iterTau) = sum(temp > 0);

@@ -1,5 +1,5 @@
 MKLDIR = /usr/local/intel/mkl
-MATLABDIR = /usr/local/matlabR2009a
+MATLABDIR = /usr/local/matlab
 ifdef USE_CUDA
 	CULADIR = /usr/local/cula
 	CUDADIR = /usr/local/cuda
@@ -38,7 +38,7 @@ endif
 CC = gcc
 MEXFLAGS = -DUSE_MATLAB_INTERFACE -DMATLAB_MEX_FILE -D_GNU_SOURCE -DNDEBUG -fexceptions -fno-omit-frame-pointer
 MKLFLAGS = -DMKL_ILP64 -DUSE_DOUBLE_PRECISION -m64
-GENERALFLAGS = -fPIC -Wall -g -pedantic
+GENERALFLAGS = -fPIC -W -Wall -Wextra -g -pedantic
 OPTIMFLAGS = -march=native -O3 -ffast-math -fopenmp -pthread
 REPORTSFLAGS = -Winline -Wimplicit
 DEBUGFLAG = -g -D__DEBUG__

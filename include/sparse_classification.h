@@ -19,6 +19,8 @@
  * TODO: Make sure than, in all non-mex functions, no data is copied if not
  * necessary, and instead the result is overwritten on the original memory.
  * Adjust calls by _mex files appropriately.
+ * TODO: Related to above, need to make a decision for when to destroy inputs
+ * in terms of internal processing.
  * TODO: Remove all derivFlags, and change obj_grad files to be doing checks of
  * whether obj or deriv are NULL instead.
  * TODO: Remove all inclusions from mexfiles, except for

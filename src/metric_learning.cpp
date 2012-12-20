@@ -72,7 +72,7 @@ void convertDistanceLabelMat(INT *labelMat, DOUBLE *valVec, \
 			currVal = matlabLabelMat[2 * numLabels + iterLabel];
 			if ((currInd1 > numSamples) || (currInd1 < 1) \
 				|| (currInd2 > numSamples) || (currInd2 < 1)) {
-				ERROR("Invalid bound constraint: index out of bounds.");
+				ERROR("Invalid label constraint: index out of bounds.");
 			}
 			labelMat[iterLabel] = currInd1 - 1;
 			labelMat[numLabels + iterLabel] = currInd2 - 1;
@@ -92,7 +92,7 @@ void convertDistanceLabelMat(INT *labelMat, DOUBLE *valVec, \
 				|| (currInd2 > numSamples) || (currInd2 < 1) \
 				|| (currInd3 > numSamples) || (currInd3 < 1) \
 				|| (currInd4 > numSamples) || (currInd4 < 1)) {
-				ERROR("Invalid bound constraint: index out of bounds.");
+				ERROR("Invalid relational constraint: index out of bounds.");
 			}
 			labelMat[iterLabel] = currInd1 - 1;
 			labelMat[numLabels + iterLabel] = currInd2 - 1;
@@ -225,6 +225,9 @@ void itml(DOUBLE *A, DOUBLE *X, INT *constraintMat, DOUBLE *boundVec, \
 		SYR(&UPLO, &SYRN, &alpha, Avec, &INCX, A, &SYRLDA);
 
 		++iterConstraint;
+		if (iterConstraint % 1000 == 0) {
+			PRINTF("Now running constraint %d of %d.\n", iterConstraint, numConstraints);
+		}
 		if (iterConstraint == numConstraints) {
 			++epochCount;
 			PRINTF("Finished epoch %d.\n", epochCount);

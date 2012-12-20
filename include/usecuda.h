@@ -15,11 +15,6 @@
 #include "cuda_runtime.h"
 #include "useinterfaces.h"
 
-/* TODO: Change #define's to typedefs and consts, or other alternative (inline)
- * for function names.
- * TODO: Link MKL with ARPACK and PROPACK
- */
-
 #ifdef USE_DOUBLE_PRECISION
 typedef double CUDOUBLE;
 #elif defined(USE_SINGLE_PRECISION)

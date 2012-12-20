@@ -687,7 +687,12 @@ void robust_weighted_operator_pca_apg_cuda(CUHANDLE handle, CUDOUBLE *h_B, \
  * 		+ 1 / 2 * ||(D - B * Y ^ T - A) * W||_Fro ^ 2.
  */
 
-/* TODO: Drop low-rank kernel matrix case. */
+/*
+ * TODO: Drop low-rank kernel matrix case.
+ * TODO: Maybe use triangular Cholesky factors instead of Y = sqrt(K). Do not
+ * expect to yield large speedups (this is a small multiplication, bottleneck
+ * is in the SVD).
+ */
 
 void robust_weighted_operator_pca_apg(DOUBLE *B, DOUBLE *A, DOUBLE *D, \
 				DOUBLE *Y, DOUBLE *W, DOUBLE mu, DOUBLE lambda, \

@@ -1,5 +1,5 @@
 MKLDIR = /usr/local/intel/mkl
-MATLABDIR = /usr/local/matlabR2009a
+MATLABDIR = /usr/local/matlab
 ifdef USE_CUDA
 	CULADIR = /usr/local/cula
 	CUDADIR = /usr/local/cuda

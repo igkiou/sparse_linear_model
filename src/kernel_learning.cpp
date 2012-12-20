@@ -222,7 +222,7 @@ void nrkl_svt(DOUBLE *K, INT *constraintMat, DOUBLE *betaVec, DOUBLE tau, \
 	DOUBLE kappaInit = floor(tau / numPoints / ABS(minNegBeta) / delta);
 	for (iterConstraint = 0; iterConstraint < numConstraints; \
 		++iterConstraint) {
-		zetaVec[iterConstraint] = kappaInit * delta * IMAX(-betaVec[iterConstraint], 0);
+		zetaVec[iterConstraint] = kappaInit * delta * IMAX(-betaVec[iterConstraint], 0.0);
 	}
 //	/* dkl - dij > 1, beta = 1, Uzawa08 */
 //	DOUBLE maxPosBeta = 0;
@@ -301,7 +301,7 @@ void nrkl_svt(DOUBLE *K, INT *constraintMat, DOUBLE *betaVec, DOUBLE tau, \
 				+ K[coord4 * numPoints + coord4] \
 				- 2 * K[coord3 * numPoints + coord4];
 			/* dij - dkl < - 1, beta = - 1, NIPS10 */
-			zetaVec[iterConstraint] -= delta * IMAX(dij - dkl - beta, 0);
+			zetaVec[iterConstraint] -= delta * IMAX(dij - dkl - beta, 0.0);
 			if (dij - dkl - beta > 0) {
 				maxDivergence = dij - dkl - beta;
 				normDivergence += SQR(dij - dkl - beta);

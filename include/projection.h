@@ -48,4 +48,11 @@ void kernel_sphere_projection_batch(DOUBLE *kernelMat, DOUBLE *norm, DOUBLE radi
 void kernel_ball_projection_batch(DOUBLE *kernelMat, DOUBLE *norm, DOUBLE radius, \
 						INT K);
 
+
+void l1_sphere_projection_batch(DOUBLE *D, DOUBLE *norm, DOUBLE radius, INT N, \
+							INT K);
+
+void l1_ball_projection_batch(DOUBLE *D, DOUBLE *norm, DOUBLE radius, INT N, \
+							INT K);
+
 #endif /* __PROJECTION_H__ */

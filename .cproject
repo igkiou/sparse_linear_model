@@ -23,12 +23,13 @@
 								<option id="intel.compilestep.preprocessor.includedirectories.1392255510" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/local/cuda/include"/>
 									<listOptionValue builtIn="false" value="/usr/local/cula/include"/>
+									<listOptionValue builtIn="false" value="/usr/local/intel/mkl/include"/>
 								</option>
-								<option id="intel.compilestep.preprocessor.defsym.143267388" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
+								<option id="intel.compilestep.preprocessor.defsym.143267388" name="Preprocessor Definitions (-D)" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_CUDA=1"/>
 									<listOptionValue builtIn="false" value="USE_CUSTOM_BLAS=0"/>
 								</option>
-								<option id="intel.compilestep.preprocessor.undefsym.966640254" superClass="intel.compilestep.preprocessor.undefsym" valueType="undefDefinedSymbols">
+								<option id="intel.compilestep.preprocessor.undefsym.966640254" name="Undefine Preprocessor Definitions (-U)" superClass="intel.compilestep.preprocessor.undefsym" valueType="undefDefinedSymbols">
 									<listOptionValue builtIn="false" value="USE_CUSTOM_BLAS"/>
 								</option>
 								<inputType id="intel.c.compilestep.input.576573318" superClass="intel.c.compilestep.input"/>
@@ -286,6 +287,7 @@
 				</scannerConfigBuildInfo>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">

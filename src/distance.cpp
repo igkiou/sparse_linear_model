@@ -158,6 +158,16 @@ void l2_distance(DOUBLE *distanceMat, DOUBLE *X1, DOUBLE *X2, INT N, INT numSamp
 		numSamples2 = numSamples1;
 	}
 	
+	if ((oneArgFlag == 1) && (numSamples1 == 1)) {
+		*distanceMat = 0;
+		return;
+	}
+
+	if ((oneArgFlag == 0) && (numSamples1 == 1) && (numSamples2 == 1)) {
+		l2_distance_vec(X1, X2, N, sqrtFlag, NULL);
+		return;
+	}
+
 	INT normMat1Flag = 0;
 	if (normMat1 == NULL) {
 		normMat1 = (DOUBLE *) MALLOC(numSamples1 * 1 * sizeof(DOUBLE));
@@ -322,6 +332,16 @@ void mahalanobis_distance(DOUBLE *distanceMat, DOUBLE *X1, DOUBLE *X2, DOUBLE *A
 		oneArgFlag = 1;
 		X2 = X1;
 		numSamples2 = numSamples1;
+	}
+
+	if ((oneArgFlag == 1) && (numSamples1 == 1)) {
+		*distanceMat = 0;
+		return;
+	}
+
+	if ((oneArgFlag == 0) && (numSamples1 == 1) && (numSamples2 == 1)) {
+		mahalanobis_distance_vec(X1, X2, A, N, sqrtFlag, tempX1, tempX2);
+		return;
 	}
 
 	INT normMat1Flag = 0;
@@ -574,6 +594,12 @@ void mahalanobis_distance_factored(DOUBLE *distanceMat, DOUBLE *X1, DOUBLE *X2, 
 void kernel_distance(DOUBLE *distanceMat, DOUBLE *K, INT numSamples, INT sqrtFlag, \
 					DOUBLE *normMat, DOUBLE *oneVec) {
 
+
+	if (numSamples == 1) {
+		*distanceMat = 0;
+		return;
+	}
+
 	INT normMatFlag = 0;
 	if (normMat == NULL) {
 		normMat = (DOUBLE *) MALLOC(numSamples * 1 * sizeof(DOUBLE));
@@ -645,7 +671,7 @@ void kernel_distance(DOUBLE *distanceMat, DOUBLE *K, INT numSamples, INT sqrtFla
 }
 
 /*
- * L2-norm distance.
+ * L1-norm distance.
  */
 void l1_distance(DOUBLE *distanceMat, DOUBLE *X1, DOUBLE *X2, INT N, INT numSamples1, INT numSamples2) { //, \
 //					DOUBLE *tempVec) {
@@ -655,6 +681,16 @@ void l1_distance(DOUBLE *distanceMat, DOUBLE *X1, DOUBLE *X2, INT N, INT numSamp
 		oneArgFlag = 1;
 		X2 = X1;
 		numSamples2 = numSamples1;
+	}
+
+	if ((oneArgFlag == 1) && (numSamples1 == 1)) {
+		*distanceMat = 0;
+		return;
+	}
+
+	if ((oneArgFlag == 0) && (numSamples1 == 1) && (numSamples2 == 1)) {
+		l1_distance_vec(X1, X2, N, NULL);
+		return;
 	}
 
 	/*INT tempVecFlag = 0;
@@ -697,12 +733,26 @@ void l1_distance(DOUBLE *distanceMat, DOUBLE *X1, DOUBLE *X2, INT N, INT numSamp
 			}
 
 		} else {
-			#pragma omp for
-			for (iterX2 = 0; iterX2 < numSamples2; ++iterX2) {
+			/* This is more efficient when numSamples2 > numSamples1. If not,
+			 * then it may be beneficial switching the order of the two for
+			 * loops, however then worse memory access pattern in distanceMat.
+			 * Here, we only implement the trivial case when numSamples2 == 1.
+			 */
+			if (numSamples2 > 1) {
+				#pragma omp for
+				for (iterX2 = 0; iterX2 < numSamples2; ++iterX2) {
+					for (iterX1 = 0; iterX1 < numSamples1; ++iterX1) {
+						datacpy(tempVec, &X1[iterX1 * N], N);
+						AXPY(&AXPYN, &alpha, &X2[iterX2 * N], &incx, tempVec, &incy);
+						distanceMat[iterX2 * numSamples1 + iterX1] = ASUM(&ASUMN, tempVec, &incx);
+					}
+				}
+			} else {
+				#pragma omp for
 				for (iterX1 = 0; iterX1 < numSamples1; ++iterX1) {
 					datacpy(tempVec, &X1[iterX1 * N], N);
-					AXPY(&AXPYN, &alpha, &X2[iterX2 * N], &incx, tempVec, &incy);
-					distanceMat[iterX2 * numSamples1 + iterX1] = ASUM(&ASUMN, tempVec, &incx);
+					AXPY(&AXPYN, &alpha, X2, &incx, tempVec, &incy);
+					distanceMat[iterX1] = ASUM(&ASUMN, tempVec, &incx);
 				}
 			}
 		}

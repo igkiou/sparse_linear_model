@@ -235,6 +235,9 @@ inline void TRSV(CHAR *uplo, CHAR *trans, CHAR *diag, INT *n, DOUBLE *a, \
 }
 
 /* math.h functions */
+/*
+ * TODO: Consider replacing with VML versions from MKL.
+ */
 inline DOUBLE EXP(DOUBLE x) {
 	return MATHFUNC(exp)(x);
 }
@@ -255,12 +258,50 @@ inline DOUBLE TANH(DOUBLE x) {
 	return MATHFUNC(tanh)(x);
 }
 
+/*
+ * some overloaded math defines
+ * TODO: Consider replacing with templated versions? May affect performance.
+ */
+template <typename T>
+inline T ABS(T x) {
+	return ((x > 0) ? x : (-x));
+}
+
+template <typename T>
+inline T IMIN(T x, T y) {
+	return ((x < y) ? x : y);
+}
+
+template <typename T>
+inline T IMAX(T x, T y) {
+	return ((x > y) ? x : y);
+}
+
+template <typename T>
+inline T SIGN(T x) {
+	return ((x > 0) ? 1 : ((x < 0) ? (- 1) : 0));
+}
+
+inline float SIGN(float x) {
+	return ((x > 0) ? 1.0f : ((x < 0) ? (- 1.0f) : 0));
+}
+
+inline double SIGN(double x) {
+	return ((x > 0) ? 1.0 : ((x < 0) ? (- 1.0) : 0));
+}
+
+template <typename T>
+inline T SQR(T x) {
+	return x * x;
+}
+
+
 /* some math defines */
-#define SQR(X)  ((X) * (X))
-#define SIGN(X)  ((X) > 0 ? (1) : (((X) < 0 ? (-(1)) : (0))))
-#define ABS(X)  ((X) > 0 ? (X) : (-(X)))
-#define IMIN(X, Y)  ((X) < (Y) ? (X) : (Y))
-#define IMAX(X, Y)  ((X) > (Y) ? (X) : (Y))
+//#define SQR(X)  ((X) * (X))
+//#define SIGN(X)  ((X) > 0 ? (1) : (((X) < 0 ? (-(1)) : (0))))
+//#define ABS(X)  ((X) > 0 ? (X) : (-(X)))
+//#define IMIN(X, Y)  ((X) < (Y) ? (X) : (Y))
+//#define IMAX(X, Y)  ((X) > (Y) ? (X) : (Y))
 
 /* Various constants */
 #define CUSTOM_OMP_NUM_THREADS 16
