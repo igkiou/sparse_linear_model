@@ -8,6 +8,10 @@
 #ifndef __KERNEL_GRAM_H__
 #define __KERNEL_GRAM_H__
 
+/*
+ * TODO: These functions can benefit tremendously from VML.
+ */
+
 #include "useblas.h"
 
 typedef enum {

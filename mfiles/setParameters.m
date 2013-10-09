@@ -48,7 +48,7 @@ svmNumIters = 300;
 svmLossFunction = 'huber';
 svmPreprocessMode = 1;
 svmProbabilityEstimates = 0;
-params.svmRegularization = 'frobenius';
+svmRegularization = 'frobenius';
 
 % projections
 compressNumSamples = 512;

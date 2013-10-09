@@ -14,7 +14,7 @@ endif
 MEXEXT = $(shell $(MATLABDIR)/bin/mexext)
 MAPFILE = mexFunction.map
 
-MKLLIBS = -L$(MKLDIR)/lib/$(MKLARCH) $(MKLDIR)/lib/$(MKLARCH)/libmkl_solver_ilp64.a -Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group
+MKLLIBS = -L$(MKLDIR)/lib/$(MKLARCH) -Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group
 MATLABLIBS = -L$(MATLABDIR)/bin/$(MATLABARCH) -lmx -lmex -lmat
 RPATH = -Wl,-rpath-link,$(MATLABDIR)/bin/$(MATLABARCH)
 LIBS = $(RPATH) $(MATLABLIBS) $(MKLLIBS) -lm -lpthread

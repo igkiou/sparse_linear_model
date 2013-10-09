@@ -3,7 +3,7 @@
 # GENERATE_PROFILE = 1 
 # USE_PROFILE = 1
 # DEBUG_MODE = 1
-USE_CUDA = 1
+# USE_CUDA = 1
 
 # USE_GCC = 1
 ifdef USE_GCC

@@ -51,7 +51,7 @@ for iterSplit = 1:numSplits,
 % 			fea_Train = normcols(fea_Train')';
 % 			fea_Test = normcols(fea_Test')';
 % 		end;
-% 		fprintf(' LPPEu,');
+		fprintf(' LPPEu,');
 % 		[VecLPP W] = trainLPP(fea_Train, gnd_Train, dimensionRange(iterDim), 'Euclidean', 'KNN');
 % 		[fea_Train_Reduced, fea_Test_Reduced] = reduceDimension(VecLPP, fea_Train, fea_Test);
 % 		[results accuracy] = knn_classify(fea_Test_Reduced, fea_Train_Reduced, nNN, gnd_Test, gnd_Train);
@@ -158,15 +158,15 @@ for iterSplit = 1:numSplits,
 % 		[results accuracy] = knn_classify(fea_Test_Reduced, fea_Train_Reduced, 1, gnd_Test, gnd_Train);
 % 		accuracies_1NN(12, iterDim) = accuracies_1NN(12, iterDim) + accuracy;
 		
-		fprintf(' NPE,');
-		VecNPE = trainNPE(fea_Train, gnd_Train, dimensionRange(iterDim), 'KNN');
-		[fea_Train_Reduced, fea_Test_Reduced] = reduceDimension(VecNPE, fea_Train, fea_Test);
-		[results accuracy] = knn_classify(fea_Test_Reduced, fea_Train_Reduced, nNN, gnd_Test, gnd_Train);
-		accuracies(11, iterDim) = accuracies(11, iterDim) + accuracy;
-		[results accuracy] = knn_classify(fea_Test_Reduced, fea_Train_Reduced, 1, gnd_Test, gnd_Train);
-		accuracies_1NN(11, iterDim) = accuracies_1NN(11, iterDim) + accuracy;
-		
-		fprintf('\n');
+% 		fprintf(' NPE,');
+% 		VecNPE = trainNPE(fea_Train, gnd_Train, dimensionRange(iterDim), 'KNN');
+% 		[fea_Train_Reduced, fea_Test_Reduced] = reduceDimension(VecNPE, fea_Train, fea_Test);
+% 		[results accuracy] = knn_classify(fea_Test_Reduced, fea_Train_Reduced, nNN, gnd_Test, gnd_Train);
+% 		accuracies(11, iterDim) = accuracies(11, iterDim) + accuracy;
+% 		[results accuracy] = knn_classify(fea_Test_Reduced, fea_Train_Reduced, 1, gnd_Test, gnd_Train);
+% 		accuracies_1NN(11, iterDim) = accuracies_1NN(11, iterDim) + accuracy;
+% 		
+% 		fprintf('\n');
 	end;
 end;
 

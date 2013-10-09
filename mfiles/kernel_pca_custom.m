@@ -25,9 +25,6 @@ function [trainDataReduced, mapping] = kernel_pca_custom(trainData, numDimension
 % You are free to use, change, or redistribute this code in any way you
 % want for non-commercial purposes. However, it is appreciated if you 
 % maintain the name of the original author.
-%
-% (C) Laurens van der Maaten, 2010
-% University California, San Diego / Delft University of Technology
 
 if (nargin < 3),
 	gramMatrix = [];

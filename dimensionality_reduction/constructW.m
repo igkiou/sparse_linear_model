@@ -500,7 +500,7 @@ if strcmpi(options.NeighborMode,'KNN') && (options.k > 0)
     end
     
     if strcmpi(options.WeightMode,'Binary')
-        W(W) = 1;
+        W(W > 0) = 1;
     end
     
     if isfield(options,'bSemiSupervised') && options.bSemiSupervised

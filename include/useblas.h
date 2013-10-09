@@ -25,6 +25,9 @@
  * TODO: Enforce uniform check of obj = NULL, or grad = NULL, or gradFlag in
  * obj_grad functions.
  * TODO: Enforce uniform check for initialization in functions needing it.
+ * TODO: Use VML for math operations.
+ * TODO: Use either Eigen or Armadillo and convert to CPP.
+ * TODO: Incorporate routines from mkl_ext.
  */
 
 #ifdef USE_DOUBLE_PRECISION

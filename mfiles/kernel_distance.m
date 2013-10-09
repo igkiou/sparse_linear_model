@@ -1,4 +1,4 @@
-function distanceMatrix = kernel_distance(K, sqrtFlag)
+function K = kernel_distance(K, sqrtFlag)
 % Kernel norm distance matrix
 %   distanceMatrix = kernel_distance(K, sqrtFlag)
 %   K:				numSamples x numSamples Grammian matrix.
@@ -20,10 +20,10 @@ end
 % TODO: Compare with dist_euclid.m
 	
 Dsq = diag(K);
-distanceMatrix = bsxfun(@plus, Dsq, bsxfun(@minus, Dsq', 2 * K));
+K = bsxfun(@plus, Dsq, bsxfun(@minus, Dsq', 2 * K));
 if (sqrtFlag == 1),
-	distanceMatrix = sqrt(distanceMatrix);
-	distanceMatrix = real(distanceMatrix);
+	K = sqrt(K);
+	K = real(K);
 end;
-distanceMatrix = max(distanceMatrix, distanceMatrix');
-distanceMatrix = distanceMatrix - diag(diag(distanceMatrix));
+K = max(K, K');
+K = K - diag(diag(K));

@@ -14,6 +14,7 @@
 /* TODO: Extend to matrix distances? */
 /* TODO: Also add BLAS wrappers for norms? */
 /* TODO: Also add matrix norms? */
+/* TODO: These functions can benefit tremendously from VML. */
 typedef enum {
 	DISTANCE_L2 = 0,
 	DISTANCE_MAHALANOBIS = 1,
