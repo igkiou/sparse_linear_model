@@ -4,3 +4,4 @@
 - Write mex files for huberhinge versions of multi-task SVM
 - Integrate gcc-gsl solvers into code
 - Check with new MATLAB
+- Add approximate l1 projections from sofia-ml
